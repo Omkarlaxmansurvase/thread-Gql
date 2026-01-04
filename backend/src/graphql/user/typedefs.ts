@@ -1,0 +1,1 @@
+export const typeDefs= `# GraphQL User Type Definitions`
