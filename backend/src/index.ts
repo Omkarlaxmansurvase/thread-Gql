@@ -1,28 +1,34 @@
 import express from "express";
-// import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@as-integrations/express5';
-// import { prismaClient } from "./lib/db.js";
+import { expressMiddleware } from "@as-integrations/express5";
 import createApolloServer from "./graphql/index.js";
+import UserService from "./services/user.js";
 
-async function init() {
-    const app = express();
-    const PORT = Number(process.env.PORT) || 3000;
-    app.use(express.json());
+async function startServer() {
+  const app = express();
+  app.use(express.json());
 
-    
+  app.use(
+    "/graphql",
+    expressMiddleware(await createApolloServer(), {
+      context: async ({ req }) => {
+        const authHeader = req.headers.authorization;
+        const token = authHeader?.split(" ")[1];
 
-    
+        if (!token) return {};
 
-    app.get("/", (req, res) => {
-        res.send("Hello, World!");
-    });
+        try {
+          const payload = UserService.decodeJWT(token);
+          return { userId: payload.id };
+        } catch {
+          return {};
+        }
+      },
+    })
+  );
 
-    app.use("/graphql", expressMiddleware(await createApolloServer()));
-
-    app.listen(PORT, () => {
-        console.log(`Server is running on http://localhost:${PORT}`);
-        console.log(`GraphQL endpoint: http://localhost:${PORT}/graphql`);
-    });
+  app.listen(3000, () => {
+    console.log("🚀 Server running at http://localhost:3000/graphql");
+  });
 }
 
-init();
+startServer();

@@ -1,63 +1,61 @@
-import { User } from "../graphql/user/index.js";
 import { prismaClient } from "../lib/db.js";
-import { createHmac,randomBytes } from "node:crypto";
+import { createHmac, randomBytes } from "node:crypto";
 import jwt from "jsonwebtoken";
 
-export interface CreateUserPayload{
-    firstName:string
-    lastName:string
-    email:string
-    password:string
+export interface CreateUserPayload {
+  firstName: string;
+  lastName?: string;
+  email: string;
+  password: string;
 }
 
-export interface getUserTokenPayload{
-    email:string;
-    password:string;
+export interface LoginPayload {
+  email: string;
+  password: string;
 }
 
-export default class UserService{
+export default class UserService {
+  private static hashPassword(salt: string, password: string) {
+    return createHmac("sha256", salt).update(password).digest("hex");
+  }
 
-    private static generateHash(salt:string,password:string){
-        const hashedPassword = createHmac('sha256',salt).update(password).digest('hex');
-        return hashedPassword;
+  static async createUser(payload: CreateUserPayload) {
+  const salt = randomBytes(32).toString("hex");
+  const hashedPassword = this.hashPassword(salt, payload.password);
+
+  return prismaClient.user.create({
+    data: {
+      firstName: payload.firstName,
+      lastName: payload.lastName ?? null, // ✅ FIX
+      email: payload.email,
+      password: hashedPassword,
+      salt,
+    },
+  });
+}
+
+  static async login(payload: LoginPayload) {
+    const user = await prismaClient.user.findUnique({
+      where: { email: payload.email },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    const hashedPassword = this.hashPassword(user.salt, payload.password);
+    if (hashedPassword !== user.password) {
+      throw new Error("Invalid credentials");
     }
 
-    public static createUser(payload:CreateUserPayload){
-        const {firstName,lastName,email,password}=payload;
-        const salt = randomBytes(32).toString('hex');
-        const hashPassword = this.generateHash(salt,password);
-        
-        return prismaClient.user.create({
-            data:{
-                firstName,
-                lastName,
-                email,
-                salt,
-                password : hashPassword
-            }
-        })
-    }
+    return jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET as string
+    );
+  }
 
-    private static getUserByEmail(email:string){
-        return prismaClient.user.findUnique({where:{email}});
-    }
-
-    public static async getUserToken(payload:getUserTokenPayload){
-        const {email,password}=payload;
-        const user = await UserService.getUserByEmail(email);
-        if(!user){
-            throw new Error('User not found');
-        }
-
-        const userSalt = user.salt;
-        const userHashedPassword = UserService.generateHash(userSalt,password);
-        if(userHashedPassword !== user.password){
-            throw new Error('Invalid password');
-
-
-        }
-        // generate token 
-        const token = jwt.sign({id:user.id,email:user.email},process.env.JWT_SECRET as string);
-        return token;
-    }
+  static decodeJWT(token: string) {
+    return jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: number;
+      email: string;
+    };
+  }
 }

@@ -1,33 +1,15 @@
-import { ApolloServer } from '@apollo/server';
-import {User} from './user/index.js'
+import { ApolloServer } from "@apollo/server";
+import user from "./user/index.js";
+import thread from "./thread/index.js";
 
+export default async function createApolloServer() {
+  const server = new ApolloServer({
+    typeDefs: [user.typedefs, thread.typedefs],
+    resolvers: [user.resolvers, thread.resolvers],
+  });
 
-async function createApolloServer(){
+  
+  await server.start();
 
-    const gqlServer = new ApolloServer({
-        typeDefs: `
-            
-            type Query {
-                ${User.queries}
-            }
-            
-            type Mutation {
-                ${User.mutations}
-            }
-        `,
-        resolvers: {
-            Query: {
-                ...User.resolvers.queries
-            },
-            Mutation: {
-                ...User.resolvers.mutations
-            }
-        }
-    });
-
-    await gqlServer.start();
-    return gqlServer;
-
+  return server;
 }
-
-export default createApolloServer;

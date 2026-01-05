@@ -1,24 +1,22 @@
-// import UserService , {CreateUserPayload} from "../../services/user.js"
-
-import type { CreateUserPayload } from "../../services/user.js";
 import UserService from "../../services/user.js";
+import { prismaClient } from "../../lib/db.js";
 
-const queries = {
-    getUserToken: async(_:any,payload:{email:string,password:string})=>{
-        const token = await UserService.getUserToken({
-            email:payload.email,
-            password:payload.password
-        });
-        return token;
-    }
-}
-const mutations = {
-    createUser: async(_:any,payload:CreateUserPayload)=>{
-        // return "User Created";
-        const res = await UserService.createUser(payload)
-        return res.id;
-    }
-    
-}
+export const resolvers = {
+  Query: {
+    me: async (_: any, __: any, { userId }: any) => {
+      if (!userId) return null;
+      return prismaClient.user.findUnique({ where: { id: userId } });
+    },
+  },
 
-export const resolvers= {queries,mutations}
+  Mutation: {
+    register: (_: any, payload: any) => {
+      return UserService.createUser(payload);
+    },
+
+    login: async (_: any, payload: any) => {
+      const token = await UserService.login(payload);
+      return { token };
+    },
+  },
+};
