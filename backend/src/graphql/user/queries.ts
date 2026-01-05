@@ -1,1 +1,1 @@
-export const queries= `# GraphQL User Queries`
+export const queries= `getUserToken(email:String!,password:String!):String`

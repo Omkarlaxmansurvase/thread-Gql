@@ -13,6 +13,7 @@
   "description": "",
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.3",
     "@types/pg": "^8.16.0",
     "prisma": "^6.0.0",
@@ -25,6 +26,7 @@
     "@as-integrations/express5": "^1.1.2",
     "@prisma/client": "^6.0.0",
     "express": "^5.2.1",
-    "graphql": "^16.12.0"
+    "graphql": "^16.12.0",
+    "jsonwebtoken": "^9.0.3"
   }
 }
