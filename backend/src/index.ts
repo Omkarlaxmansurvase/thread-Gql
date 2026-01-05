@@ -1,10 +1,20 @@
 import express from "express";
+import cors from "cors";
 import { expressMiddleware } from "@as-integrations/express5";
 import createApolloServer from "./graphql/index.js";
 import UserService from "./services/user.js";
 
 async function startServer() {
   const app = express();
+
+  // 🔑 CORS (REQUIRED for Expo Web)
+  app.use(
+    cors({
+      origin: "http://localhost:8081", // Expo web
+      credentials: true,
+    })
+  );
+
   app.use(express.json());
 
   app.use(
