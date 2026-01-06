@@ -33,3 +33,16 @@ export const DELETE_THREAD = gql`
     deleteThread(id: $id)
   }
 `;
+export const GET_THREAD = gql`
+  query GetThread($id: ID!) {
+    getThread(id: $id) {
+      id
+      content
+      createdAt
+      author {
+        id
+        firstName
+      }
+    }
+  }
+`;

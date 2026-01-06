@@ -8,6 +8,9 @@ export const resolvers = {
         where: { id: parent.authorId },
       });
     },
+    createdAt:(parent:any)=>{
+      return parent.createdAt.toISOString();
+    }
   },
 
   Query: {

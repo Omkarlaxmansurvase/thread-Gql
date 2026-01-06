@@ -65,11 +65,17 @@ export default function LoginScreen() {
       await AsyncStorage.setItem("token", token);
 
       Toast.show({
-        type: "success",
-        text1: "Login successful 🎉",
-      });
+  type: "success",
+  text1: "Login successful",
+  autoHide: true,
+  visibilityTime: 1500,
+});
 
-      router.replace("/feed");
+setTimeout(() => {
+  Toast.hide(); 
+  router.replace("/feed");
+}, 1600);
+
     } catch (err: any) {
       Toast.show({
         type: "error",
