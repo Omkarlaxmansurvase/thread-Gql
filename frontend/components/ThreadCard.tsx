@@ -1,6 +1,6 @@
 // components/ThreadCard.tsx
 import { Box, Text, HStack, VStack } from "@gluestack-ui/themed";
-
+import { Image } from "react-native";
 interface Thread {
   id: string;
   content: string;
@@ -21,37 +21,28 @@ export default function ThreadCard({ thread }: { thread: Thread }) {
     >
       <HStack space="md" alignItems="flex-start">
         {/* Avatar */}
-        <Box
-          w={36}
-          h={36}
-          bg="$borderDark"
-          rounded="$full"
+        <Image
+          source={require("@/assets/images/avatar.png")}
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: 36,
+          }}
         />
-
         {/* Content */}
         <VStack flex={1} space="xs">
           {/* Author */}
-          <Text
-            color="$textPrimary"
-            fontWeight="$bold"
-            fontSize="$sm"
-          >
+          <Text color="$textPrimary" fontWeight="$bold" fontSize="$sm">
             {thread.author.firstName}
           </Text>
 
           {/* Thread text */}
-          <Text
-            color="$textSecondary"
-            fontSize="$sm"
-          >
+          <Text color="$textSecondary" fontSize="$sm">
             {thread.content}
           </Text>
 
           {/* Time */}
-          <Text
-            color="$textSecondary"
-            fontSize="$xs"
-          >
+          <Text color="$textSecondary" fontSize="$xs">
             {new Date(thread.createdAt).toLocaleString()}
           </Text>
         </VStack>

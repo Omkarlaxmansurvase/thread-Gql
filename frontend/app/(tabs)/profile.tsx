@@ -15,6 +15,7 @@ import type { MeResponse } from "@/graphql/types";
 import type { GetAllThreadsResponse } from "@/graphql/types";
 import ThreadCard from "@/components/ThreadCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Image} from "react-native";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -53,8 +54,14 @@ export default function ProfileScreen() {
       </Text>
 
       <HStack space="md" alignItems="center">
-        <Box w={72} h={72} rounded="$full" bg="$borderDark" />
-        <VStack>
+<Image
+  source={require("@/assets/images/avatar.png")}
+  style={{
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+  }}
+/>        <VStack>
           <Text color="$textPrimary" fontWeight="$bold" size="lg">
             {user.firstName}
           </Text>
